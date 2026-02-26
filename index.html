@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH CHILL | PREMIUM STORE</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: #0f0f0f;
+            --accent: #00d2ff; /* Màu xanh Chill rực rỡ */
+            --buy-btn: #ffbc00; /* Màu vàng sang trọng cho nút Mua ngay */
+            --text-main: #ffffff;
+            --text-sub: #666;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.6; }
+
+        /* HEADER VỚI CHỮ CHILL GRADIENT */
+        .hero { padding: 100px 20px 60px; text-align: center; }
+        .hero h1 { 
+            font-size: 4rem; 
+            font-weight: 800; 
+            letter-spacing: 5px; 
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #00d2ff 0%, #0072ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        .hero p { color: var(--text-sub); letter-spacing: 4px; font-size: 0.75rem; text-transform: uppercase; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 30px; }
+
+        /* THANH TÌM KIẾM SANG TRỌNG */
+        .search-container { max-width: 600px; margin: 0 auto 60px; position: relative; }
+        #search-input {
+            width: 100%;
+            padding: 16px 25px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 50px;
+            color: #fff;
+            outline: none;
+            text-align: center;
+            transition: 0.3s;
+        }
+        #search-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(0,210,255,0.1); }
+
+        /* GRID DANH MỤC 4 CỘT - CHỮ DƯỚI ẢNH */
+        .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+        .cat-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.4s; border: 1px solid #1a1a1a; }
+        .cat-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .cat-img { width: 100%; aspect-ratio: 1/1; overflow: hidden; }
+        .cat-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .cat-card:hover img { transform: scale(1.08); }
+        .cat-info { padding: 25px 15px; text-align: center; background: #0a0a0a; }
+        .cat-info h3 { font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+        .cat-info p { font-size: 0.65rem; color: #444; margin-top: 8px; font-weight: 600; }
+
+        /* MODAL & NÚT MUA NGAY */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; z-index: 9999; overflow-y: auto; padding: 50px 20px; }
+        .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 40px auto; }
+        .prod-card { background: #0f0f0f; padding: 20px; border-radius: 8px; border: 1px solid #1a1a1a; text-align: center; }
+        .prod-card img { width: 100%; border-radius: 4px; margin-bottom: 20px; }
+        .p-name { font-size: 0.9rem; font-weight: 600; height: 45px; overflow: hidden; margin-bottom: 10px; }
+        .p-price { font-size: 1.2rem; font-weight: 700; color: #ff4d2d; margin-bottom: 20px; }
+        
+        /* NÚT MUA NGAY KIỂU MỚI */
+        .btn-buy { 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: var(--buy-btn); 
+            color: #000; 
+            text-decoration: none; 
+            padding: 14px; 
+            border-radius: 8px; 
+            font-weight: 800; 
+            font-size: 0.85rem; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .btn-buy:hover { background: #fff; transform: scale(1.02); }
+
+        /* FOOTER KIỂU MV MEN STYLE */
+        footer { margin-top: 100px; padding: 60px 20px; border-top: 1px solid #111; text-align: center; }
+        .footer-txt { color: #333; font-size: 0.7rem; letter-spacing: 3px; font-weight: 600; }
+
+        @media (max-width: 1024px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1>TECH CHILL</h1>
+        <p>HIGH-END ACCESSORIES</p>
+    </header>
+
+    <div class="container">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm hoặc thương hiệu...">
+        </div>
+
+        <div id="cat-display" class="cat-grid"></div>
+    </div>
+
+    <div id="modal-box" class="modal">
+        <span onclick="closeModal()" style="color: #444; font-size: 40px; cursor: pointer; position: absolute; right: 40px; top: 20px;">&times;</span>
+        <h2 id="modal-title" style="text-align: center; text-transform: uppercase; letter-spacing: 5px; font-weight: 800;"></h2>
+        <div id="prod-display" class="prod-grid"></div>
+    </div>
+
+    <footer>
+        <p class="footer-txt">© 2026 TECH CHILL. PREMIUM AFFILIATE STORE.</p>
+    </footer>
+
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZHb3o7TiAYoHzHrIFgk1QyDvcQoc_mQLk3B3TOePK7Vl6P96EupXBKQqb0nwuZw8qCg6H_B2k9V9k/pub?gid=0&single=true&output=csv';
+        let storeData = [];
+
+        function init() {
+            Papa.parse(CSV_URL, {
+                download: true, header: true,
+                complete: (res) => {
+                    storeData = res.data.filter(i => i.Category && i.Product_Name);
+                    render(storeData);
+                }
+            });
+        }
+
+        function render(data) {
+            const grid = document.getElementById('cat-display');
+            grid.innerHTML = '';
+            const cats = [...new Set(data.map(i => i.Category))];
+
+            cats.forEach(c => {
+                const item = data.find(i => i.Category === c);
+                const count = data.filter(i => i.Category === c).length;
+                const el = document.createElement('div');
+                el.className = 'cat-card';
+                el.onclick = () => openModal(c);
+                el.innerHTML = `
+                    <div class="cat-img"><img src="${item.Image_URL}"></div>
+                    <div class="cat-info">
+                        <h3>${c}</h3>
+                        <p>${count} SẢN PHẨM</p>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+        }
+
+        function openModal(name) {
+            const m = document.getElementById('modal-box');
+            const list = document.getElementById('prod-display');
+            const prods = storeData.filter(i => i.Category === name);
+            document.getElementById('modal-title').innerText = name;
+            list.innerHTML = '';
+            prods.forEach(p => {
+                list.innerHTML += `
+                    <div class="prod-card">
+                        <img src="${p.Image_URL}">
+                        <div class="p-name">${p.Product_Name}</div>
+                        <div class="p-price">${parseInt(p.Price_Sale).toLocaleString()}đ</div>
+                        <a href="${p.Shopee_Aff_Link}" target="_blank" class="btn-buy">MUA NGAY 🛒</a>
+                    </div>
+                `;
+            });
+            m.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-box').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        init();
+    </script>
+</body>
+</html>
