@@ -153,7 +153,7 @@
                 const item = data.find(i => i.Category === c);
                 const count = data.filter(i => i.Category === c).length;
                 const el = document.createElement('div');
-  009  el.className = 'cat-card';
+                el.className = 'cat-card'; // <--- ĐÃ SỬA LỖI Ở ĐÂY (Xóa '009')
                 el.onclick = () => openModal(c);
                 el.innerHTML = `
                     <div class="cat-img"><img src="${item.Image_URL}"></div>
@@ -162,7 +162,7 @@
                         <p>${count} SẢN PHẨM</p>
                     </div>
                 `;
-            grid.appendChild(el);
+            	grid.appendChild(el);
             });
         }
 
